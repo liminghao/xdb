@@ -17,6 +17,8 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
+#include "redis_protocol_analyzer.h"
+
 namespace xdb {
 
 class Context : boost::noncopyable {
@@ -25,7 +27,7 @@ public:
     ~Context();
 
 private:
-
+    RedisProtocolAnalyzer redis_protocol_analyzer_;
 };
 
 } // namespace xdb

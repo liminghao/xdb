@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
-#ifndef XDB_TPL_H_
-#define XDB_TPL_H_
+#ifndef XDB_REDIS_PROTOCOL_ANALYZER_H_
+#define XDB_REDIS_PROTOCOL_ANALYZER_H_
 
 #include <boost/noncopyable.hpp>
 #include <stdio.h>
@@ -11,10 +11,10 @@
 
 namespace xdb {
 
-class ClassTPL: boost::noncopyable {
+class RedisProtocolAnalyzer : boost::noncopyable {
 public:
-    ClassTPL();
-    ~ClassTPL();
+    RedisProtocolAnalyzer();
+    ~RedisProtocolAnalyzer();
 
 private:
 
