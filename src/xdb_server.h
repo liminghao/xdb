@@ -6,8 +6,11 @@
 #define XDB_SERVER_H_
 
 #include <boost/noncopyable.hpp>
+#include <string>
+#include <map>
 
 #include "data_server.h"
+#include "context.h"
 
 namespace xdb {
 

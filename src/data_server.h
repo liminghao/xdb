@@ -5,6 +5,12 @@
 #ifndef XDB_DATA_SERVER_H_
 #define XDB_DATA_SERVER_H_
 
+#include <boost/noncopyable.hpp>
+#include <boost/bind.hpp>
+#include <utility>
+#include <stdio.h>
+#include <unistd.h>
+
 #include <muduo/net/TcpServer.h>
 #include <muduo/base/Atomic.h>
 #include <muduo/base/Logging.h>
@@ -12,17 +18,15 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
-#include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
-#include <utility>
-#include <stdio.h>
-#include <unistd.h>
+#include "context.h"
 
 namespace xdb {
 
+class XdbServer;
+
 class DataServer : boost::noncopyable {
 public:
-	DataServer();
+	DataServer(XdbServer *xdb_server);
 	~DataServer();
 
     void Init();
@@ -36,6 +40,9 @@ private:
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer* server_;
     int loop_thread_num_;
+
+    XdbServer *xdb_server_;
+    std::map<std::string, Context*> contexts_;
 };
 
 } // namespace xdb

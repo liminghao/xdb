@@ -2,12 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
+#include <string>
+#include <map>
+
 #include "data_server.h"
+#include "context.h"
 
 namespace xdb {
 
-DataServer::DataServer()
-    :loop_thread_num_(1)
+void delete_context(void *p)
+{
+    Context *c = static_cast<Context*> (p);
+    delete c;
+}
+
+DataServer::DataServer(XdbServer *xdb_server)
+    :loop_thread_num_(1), xdb_server_(xdb_server)
 {
 
 }
@@ -40,10 +50,16 @@ void DataServer::Start()
 void DataServer::_OnConnection(
     const muduo::net::TcpConnectionPtr& conn)
 {
-    LOG_INFO << "DataServer _OnConnection "
+    LOG_INFO << "DataServer::_OnConnection "
         << conn->peerAddress().toIpPort() << " -> "
         << conn->localAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
+        << (conn->connected() ? "UP" : "DOWN") << " name: "
+        << conn->name();
+
+    // set context
+    Context *c = new Context();
+    conn->set_private_data(c);
+    conn->set_private_data_destroy(delete_context);
 }
 
 void DataServer::_OnMessage(

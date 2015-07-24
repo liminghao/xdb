@@ -8,7 +8,7 @@ namespace xdb {
 
 XdbServer::XdbServer()
 {
-    data_server_ = new DataServer();
+    data_server_ = new DataServer(this);
 }
 
 XdbServer::~XdbServer()
