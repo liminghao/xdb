@@ -17,17 +17,24 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
+#include "store_engine.h"
 #include "redis_protocol_analyzer.h"
 
 namespace xdb {
 
 class Context : boost::noncopyable {
 public:
-    Context();
+    Context(muduo::net::TcpConnection *conn, StoreEngine *store_engine);
     ~Context();
 
+    int Parse(muduo::net::Buffer* buf);
+    void PrintCmd();
+    int ExecuteCmd();
+    
 private:
     RedisProtocolAnalyzer redis_protocol_analyzer_;
+    muduo::net::TcpConnection *conn_;
+    StoreEngine *store_engine_;
 };
 
 } // namespace xdb

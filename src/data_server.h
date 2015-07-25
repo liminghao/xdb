@@ -18,6 +18,7 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
+#include "store_engine.h"
 #include "context.h"
 
 namespace xdb {
@@ -43,6 +44,8 @@ private:
 
     XdbServer *xdb_server_;
     std::map<std::string, Context*> contexts_;
+
+    StoreEngine *store_engine_;
 };
 
 } // namespace xdb

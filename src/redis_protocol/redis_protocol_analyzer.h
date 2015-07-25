@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <muduo/net/Buffer.h>
+
+#include "bytes.h"
+
 namespace xdb {
 
 class RedisProtocolAnalyzer : boost::noncopyable {
@@ -16,8 +20,20 @@ public:
     RedisProtocolAnalyzer();
     ~RedisProtocolAnalyzer();
 
-private:
+    int Parse(muduo::net::Buffer* buf);   
+    void PrintCmd();
+    
+    std::vector<Bytes> *recv_bytes() 
+    { return &recv_bytes_; }
 
+    std::string *cmd()
+    { return &cmd_; }
+
+private:
+    std::vector<Bytes> recv_bytes_;
+    //std::vector<std::string> recv_string_;
+
+    std::string cmd_;
 };
 
 } // namespace xdb

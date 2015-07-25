@@ -39,10 +39,13 @@ void DataServer::Init()
     server_->setMessageCallback(boost::bind(
         &DataServer::_OnMessage, this, _1, _2, _3));
     server_->setThreadNum(loop_thread_num_);
+
+    store_engine_ = new StoreEngine();
 }
 
 void DataServer::Start()
 {
+    store_engine_->Start();
     server_->start();
     loop_->loop();
 }
@@ -57,7 +60,7 @@ void DataServer::_OnConnection(
         << conn->name();
 
     // set context
-    Context *c = new Context();
+    Context *c = new Context(conn.get(), store_engine_);
     conn->set_private_data(c);
     conn->set_private_data_destroy(delete_context);
 }
@@ -66,8 +69,18 @@ void DataServer::_OnMessage(
     const muduo::net::TcpConnectionPtr& conn,
     muduo::net::Buffer* buf, muduo::Timestamp time)
 {
+    int ret;
+
     LOG_INFO << "DataServer::_OnMessage"
         << " readable bytes: " << buf->readableBytes();
+
+    Context *c = static_cast<Context*> (conn->private_data());
+    ret = c->Parse(buf);
+    if (ret != -1) {
+        c->PrintCmd();
+        c->ExecuteCmd();
+        // need not close
+    }
 }
 
 } // namespace xdb
