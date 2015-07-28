@@ -8,22 +8,28 @@ namespace xdb {
 
 XdbServer::XdbServer()
 {
+    admin_server_ = new AdminServer(this);
     data_server_ = new DataServer(this);
 }
 
 XdbServer::~XdbServer()
 {
     delete data_server_;
+    delete admin_server_;
 }
 
 void XdbServer::Init()
 {
+    LOG_INFO << "AdminServer initialize ...";
+    admin_server_->Init();
+    
     LOG_INFO << "DataServer initialize ...";
     data_server_->Init();
 }
 
 void XdbServer::Start()
 {
+    admin_server_->Start();
     data_server_->Start();
 }
 

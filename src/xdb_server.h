@@ -9,12 +9,14 @@
 #include <string>
 #include <map>
 
+#include "admin_server.h"
 #include "data_server.h"
 #include "context.h"
 
 namespace xdb {
 
 class DataServer;
+class AdminServer;
 
 class XdbServer : boost::noncopyable {
 public:
@@ -27,6 +29,7 @@ public:
 
 private:
     DataServer *data_server_;
+    AdminServer *admin_server_;
 };
 
 } // namespace xdb
