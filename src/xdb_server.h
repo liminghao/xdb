@@ -12,6 +12,8 @@
 #include "admin_server.h"
 #include "data_server.h"
 #include "context.h"
+#include "configure.h"
+#include "meta_manager.h"
 
 namespace xdb {
 
@@ -30,6 +32,9 @@ public:
 private:
     DataServer *data_server_;
     AdminServer *admin_server_;
+    
+    Configure *conf_;
+    MetaManager *meta_manager_;
 };
 
 } // namespace xdb

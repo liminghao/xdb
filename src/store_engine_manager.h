@@ -14,13 +14,19 @@
 
 namespace xdb {
 
+class XdbServer;
+
 class StoreEngineManager: boost::noncopyable {
 public:
     StoreEngineManager();
     ~StoreEngineManager();
 
-private:
+    int Init();
+    int Start();
+    int Stop();
 
+private:
+    XdbServer *xdb_server_;
 };
 
 } // namespace xdb

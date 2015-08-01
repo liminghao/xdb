@@ -20,6 +20,12 @@ XdbServer::~XdbServer()
 
 void XdbServer::Init()
 {
+    LOG_INFO << "Configure initialize ...";
+    conf_->InitTest();
+    
+    LOG_INFO << "MetaManager initialize ...";
+    meta_manager_->Init();
+
     LOG_INFO << "AdminServer initialize ...";
     admin_server_->Init();
     

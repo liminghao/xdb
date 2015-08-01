@@ -16,5 +16,20 @@ StoreEngineManager::~StoreEngineManager()
 
 }
 
+int StoreEngineManager::Init()
+{
+
+}
+
+int StoreEngineManager::Start()
+{
+
+}
+
+int StoreEngineManager::Stop()
+{
+
+}
+
 } // namespace xdb
 
