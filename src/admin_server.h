@@ -24,7 +24,7 @@ class XdbServer;
 
 class AdminServer : boost::noncopyable {
 public:
-	AdminServer(XdbServer *xdb_server);
+	AdminServer(XdbServer *xdb_server, uint16_t port);
 	~AdminServer();
 
     void Init();
@@ -38,6 +38,7 @@ private:
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer* server_;
     int loop_thread_num_;
+    uint16_t port_;
 
     XdbServer *xdb_server_;
 };

@@ -9,8 +9,8 @@
 
 namespace xdb {
 
-AdminServer::AdminServer(XdbServer *xdb_server)
-    :loop_thread_num_(1), xdb_server_(xdb_server)
+AdminServer::AdminServer(XdbServer *xdb_server, uint16_t port)
+    :loop_thread_num_(1), xdb_server_(xdb_server), port_(port)
 {
 
 }
@@ -23,7 +23,7 @@ AdminServer::~AdminServer()
 
 void AdminServer::Init()
 {
-    muduo::net::InetAddress listen_addr(39000);
+    muduo::net::InetAddress listen_addr(port_);
     loop_ = new muduo::net::EventLoop;
     server_ = new muduo::net::TcpServer(loop_, listen_addr, "AdminServer");
 

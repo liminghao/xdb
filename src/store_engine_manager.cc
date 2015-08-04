@@ -3,6 +3,7 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 #include "store_engine_manager.h"
+#include "xdb_server.h"
 
 namespace xdb {
 

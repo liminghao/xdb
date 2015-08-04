@@ -7,11 +7,19 @@
 
 namespace xdb {
 
-Context::Context(muduo::net::TcpConnection *conn, StoreEngine *store_engine)
+class XdbServer;
+
+Context::Context(muduo::net::TcpConnection *conn, XdbServer *xdb_server)
+    :xdb_server_(xdb_server)
 {
     conn_ = conn;
-    store_engine_ = store_engine;
 }
+
+//Context::Context(muduo::net::TcpConnection *conn, StoreEngine *store_engine)
+//{
+//    conn_ = conn;
+//    store_engine_ = store_engine;
+//}
     
 Context::~Context()
 {
@@ -21,6 +29,9 @@ Context::~Context()
 int Context::Parse(muduo::net::Buffer* buf)
 {
     int ret = redis_protocol_analyzer_.Parse(buf);
+    
+    // get engine by key
+    store_engine_ = new StoreEngine();
     return ret;
 }
 

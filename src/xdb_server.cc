@@ -8,14 +8,18 @@ namespace xdb {
 
 XdbServer::XdbServer()
 {
-    admin_server_ = new AdminServer(this);
-    data_server_ = new DataServer(this);
+    admin_server_ = new AdminServer(this, 39000);
 }
 
 XdbServer::~XdbServer()
 {
-    delete data_server_;
     delete admin_server_;
+    
+    std::map<std::string, DataServer*>::iterator it;
+    for (it = data_servers_.begin(); it != data_servers_.end(); ++it) {
+        DataServer *d = it->second;
+        delete d;
+    }
 }
 
 void XdbServer::Init()
@@ -25,21 +29,41 @@ void XdbServer::Init()
     
     LOG_INFO << "MetaManager initialize ...";
     meta_manager_->Init();
+    
+    LOG_INFO << "StoreEngineManager initialize ...";
+    store_engine_manager_->Init();
 
     LOG_INFO << "AdminServer initialize ...";
     admin_server_->Init();
     
     LOG_INFO << "DataServer initialize ...";
-    data_server_->Init();
+    _InitDataServer();
 }
 
 void XdbServer::Start()
 {
+    LOG_INFO << "StoreEngineManager start ...";
+    store_engine_manager_->Start();
+
+    LOG_INFO << "AdminServer start ...";
     admin_server_->Start();
-    data_server_->Start();
+
+    LOG_INFO << "DataServers start ...";
+    _StartDataServer();
 }
 
 void XdbServer::Stop()
+{
+
+}
+
+// init dataserver based on metadata
+int XdbServer::_InitDataServer()
+{
+
+}
+
+int XdbServer::_StartDataServer()
 {
 
 }

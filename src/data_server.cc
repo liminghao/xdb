@@ -7,6 +7,7 @@
 
 #include "data_server.h"
 #include "context.h"
+#include "xdb_server.h"
 
 namespace xdb {
 
@@ -16,8 +17,8 @@ void delete_context(void *p)
     delete c;
 }
 
-DataServer::DataServer(XdbServer *xdb_server)
-    :loop_thread_num_(1), xdb_server_(xdb_server)
+DataServer::DataServer(XdbServer *xdb_server, uint16_t port)
+    :loop_thread_num_(1), xdb_server_(xdb_server), port_(port)
 {
 
 }
@@ -30,7 +31,7 @@ DataServer::~DataServer()
 
 void DataServer::Init()
 {
-    muduo::net::InetAddress listen_addr(38000);
+    muduo::net::InetAddress listen_addr(port_);
     loop_ = new muduo::net::EventLoop;
     server_ = new muduo::net::TcpServer(loop_, listen_addr, "DataServer");
 
@@ -40,12 +41,11 @@ void DataServer::Init()
         &DataServer::_OnMessage, this, _1, _2, _3));
     server_->setThreadNum(loop_thread_num_);
 
-    store_engine_ = new StoreEngine();
+    store_engine_manager_ = xdb_server_->store_engine_manager();
 }
 
 void DataServer::Start()
 {
-    store_engine_->Start();
     server_->start();
     loop_->loop();
 }
@@ -60,7 +60,7 @@ void DataServer::_OnConnection(
         << conn->name();
 
     // set context
-    Context *c = new Context(conn.get(), store_engine_);
+    Context *c = new Context(conn.get(), xdb_server_);
     conn->set_private_data(c);
     conn->set_private_data_destroy(delete_context);
 }

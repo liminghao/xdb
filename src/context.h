@@ -22,9 +22,12 @@
 
 namespace xdb {
 
+class XdbServer;
+
 class Context : boost::noncopyable {
 public:
-    Context(muduo::net::TcpConnection *conn, StoreEngine *store_engine);
+    //Context(muduo::net::TcpConnection *conn, StoreEngine *store_engine);
+    Context(muduo::net::TcpConnection *conn, XdbServer *xdb_server);
     ~Context();
 
     int Parse(muduo::net::Buffer* buf);
@@ -34,7 +37,9 @@ public:
 private:
     RedisProtocolAnalyzer redis_protocol_analyzer_;
     muduo::net::TcpConnection *conn_;
+    
     StoreEngine *store_engine_;
+    XdbServer *xdb_server_;
 };
 
 } // namespace xdb

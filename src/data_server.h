@@ -28,7 +28,7 @@ class XdbServer;
 
 class DataServer : boost::noncopyable {
 public:
-	DataServer(XdbServer *xdb_server);
+	DataServer(XdbServer *xdb_server, uint16_t port);
 	~DataServer();
 
     void Init();
@@ -42,11 +42,11 @@ private:
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer* server_;
     int loop_thread_num_;
+    uint16_t port_;
 
     XdbServer *xdb_server_;
     std::map<std::string, Context*> contexts_;
 
-    StoreEngine *store_engine_;
     StoreEngineManager *store_engine_manager_;
 };
 

@@ -14,6 +14,7 @@
 #include "context.h"
 #include "configure.h"
 #include "meta_manager.h"
+#include "store_engine_manager.h"
 
 namespace xdb {
 
@@ -29,12 +30,22 @@ public:
     void Start();
     void Stop();
 
+    Configure *conf() { return conf_; }    
+    MetaManager *meta_manager() { return meta_manager_; }
+    StoreEngineManager *store_engine_manager()
+    { return store_engine_manager_; }
+
 private:
-    DataServer *data_server_;
+
+    int _InitDataServer();
+    int _StartDataServer();
+
     AdminServer *admin_server_;
-    
+    std::map<std::string, DataServer*> data_servers_; 
+   
     Configure *conf_;
     MetaManager *meta_manager_;
+    StoreEngineManager *store_engine_manager_;
 };
 
 } // namespace xdb
