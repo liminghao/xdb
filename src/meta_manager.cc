@@ -18,7 +18,19 @@ MetaManager::~MetaManager()
 
 int MetaManager::Init()
 {
+    // for test
+    Node *n = new Node("127.0.0.1", 39000);
+    AddNode(n);
 
+    Table *t = new Table("test_table", 1, 10, 38882, "leveldb");
+    AddTable(t);
+
+    for (int i = 0; i < 9; ++i) {
+        std::string replica_name;
+        _ReplicaName(n->name(), t->name(), i, replica_name);
+        Replica *r = new Replica(i, replica_name);
+        AddReplica(r);
+    }
 }
 
 Node* MetaManager::AddNode(Node *n)
@@ -78,7 +90,7 @@ Replica* MetaManager::GetReplica(std::string name)
 }
 
 Replica* MetaManager::GetPrimaryReplica(
-    std::string table_name, int32_t partitionid)
+    std::string table_name, int32_t replica_id)
 {
 
 }
@@ -128,6 +140,23 @@ void MetaManager::LogReplica()
             << " Status:" << r->status()
             << " BelongsToNode:" << r->node()->name();
     }
+}
+
+void MetaManager::_ReplicaName(std::string node_name, std::string table_name,
+    int32_t replica_id, std::string &replica_name)
+{
+    char buf[32];
+    memset(buf, 0, sizeof(buf));
+    snprintf(buf, sizeof(buf)-1, "%d", replica_id);
+
+    // node_name#table_name#replica_id
+    replica_name.clear();
+    replica_name.append(node_name);
+    replica_name.append("#");
+    replica_name.append(table_name);
+    replica_name.append("#");
+    replica_name.append(buf);
+    
 }
 
 } // namespace xdb

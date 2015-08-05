@@ -61,7 +61,7 @@ enum ReplicaStatus {
 class Replica : boost::noncopyable {
 public:
     Replica(int32_t id, std::string name)
-        :id_(id), name_(name), status_(kElecting) 
+        :id_(id), name_(name), status_(kPrimary) 
     {}
 
     int32_t id() { return id_; }

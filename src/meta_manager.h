@@ -29,7 +29,7 @@ public:
     Node* GetNode(std::string name);
     Replica* GetReplica(std::string name);
     Replica* GetPrimaryReplica(
-        std::string table_name, int32_t partitionid);
+        std::string table_name, int32_t replica_id);
 
     void LogMeta();
     void LogTable();
@@ -37,6 +37,8 @@ public:
     void LogReplica();
 
 private:
+    void _ReplicaName(std::string node_name, std::string table_name, 
+        int32_t replica_id, std::string &replica_name);
 
     std::map<std::string, Node*> nodes_;
     std::map<std::string, Replica*> replicas_;
