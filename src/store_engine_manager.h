@@ -24,9 +24,19 @@ public:
     int Init();
     int Start();
     int Stop();
+    
+    StoreEngine* AddStoreEngine(
+        std::string partition_name, 
+        StoreEngine* store_engine);
+
+    StoreEngine* GetStoreEngine(std::string partition_name);
+    StoreEngine* DelStoreEngine(std::string partition_name);
 
 private:
     XdbServer *xdb_server_;
+
+    // partition name -> StoreEngine
+    std::map<std::string, StoreEngine*> store_engines_;
 };
 
 } // namespace xdb

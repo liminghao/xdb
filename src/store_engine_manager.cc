@@ -32,5 +32,24 @@ int StoreEngineManager::Stop()
 
 }
 
+StoreEngine* StoreEngineManager::AddStoreEngine(
+    std::string partition_name,
+    StoreEngine* store_engine)
+{
+
+}
+
+StoreEngine* StoreEngineManager::GetStoreEngine(
+    std::string partition_name)
+{
+
+}
+
+StoreEngine* StoreEngineManager::DelStoreEngine(
+    std::string partition_name)
+{
+
+}
+
 } // namespace xdb
 

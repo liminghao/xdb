@@ -43,10 +43,10 @@ private:
     muduo::net::TcpServer* server_;
     int loop_thread_num_;
     uint16_t port_;
+    std::string table_belongto_;
 
     XdbServer *xdb_server_;
     std::map<std::string, Context*> contexts_;
-
     StoreEngineManager *store_engine_manager_;
 };
 

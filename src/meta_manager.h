@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <map>
 
+#include <muduo/base/Logging.h>
+
 #include "metadata.h"
 
 namespace xdb {
@@ -22,10 +24,17 @@ public:
     int Init();
     Node* AddNode(Node *n);
     Table* AddTable(Table *t);
-    Replica* AddReplica(Replica *p);
+    Replica* AddReplica(Replica *r);
     Table* GetTable(std::string name);
     Node* GetNode(std::string name);
     Replica* GetReplica(std::string name);
+    Replica* GetPrimaryReplica(
+        std::string table_name, int32_t partitionid);
+
+    void LogMeta();
+    void LogTable();
+    void LogNode();
+    void LogReplica();
 
 private:
 

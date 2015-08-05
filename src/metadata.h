@@ -32,6 +32,9 @@ public:
     std::string engine_type() { return engine_type_; }
     uint16_t port() { return port_; }
 
+    std::map<std::string, Replica*> *replicas()
+    { return &replicas_; }
+
     ~Table()
     {}
 
@@ -40,7 +43,10 @@ private:
     int32_t replicate_num_;  // 3
     int32_t partition_num_;  // 1024
     std::string engine_type_;
-    uint16_t port_; //data port
+    uint16_t port_;  //data port
+    
+    // replicas in the table
+    std::map<std::string, Replica*> replicas_;
 };
 
 enum ReplicaStatus {
@@ -79,6 +85,7 @@ public:
         :ip_(ip), port_(port)
     {
         char buf[128];
+        memset(buf, 0, sizeof(buf));
         sprintf(buf, "%s:%d", ip_.c_str(), port_);
         name_ = buf;
     }
@@ -89,11 +96,16 @@ public:
     std::string ip() { return ip_; }
     uint16_t port() { return port_; }
     std::string name() { return name_; }
+    std::map<std::string, Replica*> *replicas()
+    { return &replicas_; }
 
 private:
     std::string ip_;
     uint16_t port_; //command port
     std::string name_;
+
+    // replicas in the node
+    std::map<std::string, Replica*> replicas_;
 };
 
 } // namespace xdb
