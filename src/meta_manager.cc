@@ -29,6 +29,9 @@ int MetaManager::Init()
         std::string replica_name;
         _ReplicaName(n->name(), t->name(), i, replica_name);
         Replica *r = new Replica(i, replica_name);
+        r->set_node(n);
+        r->set_table(t);
+        r->set_status(kPrimary);
         AddReplica(r);
     }
 }
@@ -122,7 +125,7 @@ void MetaManager::LogNode()
     std::map<std::string, Node*>::iterator it;
     for (it = nodes_.begin(); it != nodes_.end(); ++it) {
         Node *n = it->second;
-        LOG_INFO << "Name: " << n->name()
+        LOG_INFO << "NodeName:" << n->name()
             << " Host:" << n->ip()
             << " CmdPort:" << n->port();
     }
@@ -134,7 +137,7 @@ void MetaManager::LogReplica()
     std::map<std::string, Replica*>::iterator it;
     for (it = replicas_.begin(); it != replicas_.end(); ++it) {
         Replica *r = it->second;
-        LOG_INFO << "Name: " << r->name()
+        LOG_INFO << "ReplicaName:" << r->name()
             << " BelongsToTable:" << r->table()->name()
             << " ID:" << r->id()
             << " Status:" << r->status()

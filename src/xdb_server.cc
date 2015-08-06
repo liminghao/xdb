@@ -25,15 +25,20 @@ XdbServer::~XdbServer()
 void XdbServer::Init()
 {
     LOG_INFO << "Configure initialize ...";
+    conf_ = new Configure();
     conf_->InitTest();
     
     LOG_INFO << "MetaManager initialize ...";
+    meta_manager_ = new MetaManager();
     meta_manager_->Init();
+    meta_manager_->LogMeta();
     
     LOG_INFO << "StoreEngineManager initialize ...";
+    store_engine_manager_ = new StoreEngineManager();
     store_engine_manager_->Init();
 
     LOG_INFO << "AdminServer initialize ...";
+    admin_server_ = new AdminServer(this, conf_->adminport());
     admin_server_->Init();
     
     LOG_INFO << "DataServer initialize ...";
