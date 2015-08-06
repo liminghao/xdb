@@ -36,6 +36,10 @@ public:
     void LogNode();
     void LogReplica();
 
+    std::map<std::string, Node*> *nodes() { return &nodes_; }   
+    std::map<std::string, Replica*> *replicas() { return &replicas_; }
+    std::map<std::string, Table*> *tables() { return &tables_; }
+
 private:
     void _ReplicaName(std::string node_name, std::string table_name, 
         int32_t replica_id, std::string &replica_name);

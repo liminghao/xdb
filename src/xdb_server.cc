@@ -62,15 +62,38 @@ void XdbServer::Stop()
 
 }
 
-// init dataserver based on metadata
+// init dataserver by metadata
 int XdbServer::_InitDataServer()
 {
 
+    std::map<std::string, Table*>::iterator it;
+    for (it = meta_manager_->tables()->begin(); 
+        it != meta_manager_->tables()->end(); ++it) {
+        Table *t = it->second;
+        DataServer *d = new DataServer(this, t->port(), t->name());
+        _AddDataServer(t->name(), d);
+    }
 }
 
 int XdbServer::_StartDataServer()
 {
+    std::map<std::string, DataServer*>::const_iterator it;
+    for (it = data_servers_.begin(); it != data_servers_.end(); ++it) {
+        DataServer *d = it->second;
+        d->Start();
+    }
+}
 
+DataServer *XdbServer::_AddDataServer(std::string tablename, DataServer* d)
+{
+    std::map<std::string, DataServer*>::const_iterator it = data_servers_.find(tablename);
+    if (it != data_servers_.end()) {
+        LOG_ERROR << "DataServer " << *(it->second->tablename()) << " already exist";
+        return NULL;
+    }
+    
+    data_servers_.insert(std::make_pair(tablename, d));
+    return d;
 }
 
 } // namespace xdb

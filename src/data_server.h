@@ -28,11 +28,13 @@ class XdbServer;
 
 class DataServer : boost::noncopyable {
 public:
-	DataServer(XdbServer *xdb_server, uint16_t port);
+	DataServer(XdbServer *xdb_server, uint16_t port, std::string tablename);
 	~DataServer();
 
     void Init();
     void Start();
+    std::string *tablename()
+    { return &tablename_; }
 
 private:
     void _OnConnection(const muduo::net::TcpConnectionPtr& conn);
@@ -44,6 +46,7 @@ private:
     int loop_thread_num_;
     uint16_t port_;
     std::string table_belongto_;
+    std::string tablename_;
 
     XdbServer *xdb_server_;
     std::map<std::string, Context*> contexts_;

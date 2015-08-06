@@ -39,8 +39,11 @@ private:
 
     int _InitDataServer();
     int _StartDataServer();
+    DataServer *_AddDataServer(std::string tablename, DataServer* d);
 
     AdminServer *admin_server_;
+
+    // tablename -> DataServer
     std::map<std::string, DataServer*> data_servers_; 
    
     Configure *conf_;

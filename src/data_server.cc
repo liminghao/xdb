@@ -17,8 +17,10 @@ void delete_context(void *p)
     delete c;
 }
 
-DataServer::DataServer(XdbServer *xdb_server, uint16_t port)
-    :loop_thread_num_(1), xdb_server_(xdb_server), port_(port)
+DataServer::DataServer(XdbServer *xdb_server, 
+    uint16_t port, std::string tablename)
+    :loop_thread_num_(1), xdb_server_(xdb_server), 
+    port_(port), tablename_(tablename)
 {
 
 }
