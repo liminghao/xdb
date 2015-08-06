@@ -35,6 +35,9 @@ private:
     void _OnMessage(const muduo::net::TcpConnectionPtr& conn,
                     muduo::net::Buffer* buf, muduo::Timestamp time);
 
+    void _ThreadStartFunc();
+    muduo::Thread main_thread_;
+
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer* server_;
     int loop_thread_num_;

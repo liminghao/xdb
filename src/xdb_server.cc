@@ -80,6 +80,7 @@ int XdbServer::_StartDataServer()
     std::map<std::string, DataServer*>::const_iterator it;
     for (it = data_servers_.begin(); it != data_servers_.end(); ++it) {
         DataServer *d = it->second;
+        LOG_INFO << "DataServer for " << *(d->tablename()) << " start ...";
         d->Start();
     }
 }
@@ -92,6 +93,7 @@ DataServer *XdbServer::_AddDataServer(std::string tablename, DataServer* d)
         return NULL;
     }
     
+    LOG_INFO << "Add DataServer for " << tablename;
     data_servers_.insert(std::make_pair(tablename, d));
     return d;
 }

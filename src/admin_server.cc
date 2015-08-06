@@ -10,9 +10,11 @@
 namespace xdb {
 
 AdminServer::AdminServer(XdbServer *xdb_server, uint16_t port)
-    :loop_thread_num_(1), xdb_server_(xdb_server), port_(port)
+    :loop_thread_num_(1), xdb_server_(xdb_server), port_(port),
+    main_thread_(boost::bind(
+        &AdminServer::_ThreadStartFunc, this), "AdminServerMainThread")
 {
-
+    
 }
 
 AdminServer::~AdminServer()
@@ -21,7 +23,7 @@ AdminServer::~AdminServer()
     delete loop_;
 }
 
-void AdminServer::Init()
+void AdminServer::_ThreadStartFunc()
 {
     muduo::net::InetAddress listen_addr(port_);
     loop_ = new muduo::net::EventLoop;
@@ -32,12 +34,27 @@ void AdminServer::Init()
     server_->setMessageCallback(boost::bind(
         &AdminServer::_OnMessage, this, _1, _2, _3));
     server_->setThreadNum(loop_thread_num_);
+
+    server_->start();
+    loop_->loop();
+}
+
+void AdminServer::Init()
+{
+//    muduo::net::InetAddress listen_addr(port_);
+//    loop_ = new muduo::net::EventLoop;
+//    server_ = new muduo::net::TcpServer(loop_, listen_addr, "AdminServer");
+//
+//    server_->setConnectionCallback(boost::bind(
+//        &AdminServer::_OnConnection, this, _1));
+//    server_->setMessageCallback(boost::bind(
+//        &AdminServer::_OnMessage, this, _1, _2, _3));
+//    server_->setThreadNum(loop_thread_num_);
 }
 
 void AdminServer::Start()
 {
-    server_->start();
-    loop_->loop();
+    main_thread_.start();
 }
 
 void AdminServer::_OnConnection(
