@@ -26,16 +26,16 @@ public:
     int Stop();
     
     StoreEngine* AddStoreEngine(
-        std::string partition_name, 
+        std::string replica_name, 
         StoreEngine* store_engine);
 
-    StoreEngine* GetStoreEngine(std::string partition_name);
-    StoreEngine* DelStoreEngine(std::string partition_name);
+    StoreEngine* GetStoreEngine(std::string replica_name);
+    StoreEngine* DelStoreEngine(std::string replica_name);
 
 private:
     XdbServer *xdb_server_;
 
-    // partition name -> StoreEngine
+    // replica name -> StoreEngine
     std::map<std::string, StoreEngine*> store_engines_;
 };
 

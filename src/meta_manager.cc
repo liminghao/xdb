@@ -4,10 +4,12 @@
 
 #include "meta_manager.h"
 #include "store_engine.h"
+#include "xdb_server.h"
 
 namespace xdb {
 
-MetaManager::MetaManager()
+MetaManager::MetaManager(XdbServer *xdb_server)
+    :xdb_server_(xdb_server)
 {
 
 }
@@ -18,6 +20,11 @@ MetaManager::~MetaManager()
 }
 
 int MetaManager::Init()
+{
+
+}
+
+void MetaManager::TestMeta()
 {
     // for test
     Node *n = new Node("127.0.0.1", 39000);
@@ -34,6 +41,15 @@ int MetaManager::Init()
         r->set_table(t);
         r->set_status(kPrimary);
         AddReplica(r);
+
+        // create store engine
+        char path[256];
+        memset(path, 0, sizeof(path));
+        sprintf(path, "%s/store_engine/%d",
+                        xdb_server_->conf()->data_dir()->c_str(), r->id());
+        StoreEngine *s = new StoreEngine(path);
+        s->Start();
+        xdb_server_->store_engine_manager()->AddStoreEngine(r->name(), s);
     }
 }
 
@@ -74,12 +90,6 @@ Replica* MetaManager::AddReplica(Replica *r)
     r->node()->replicas()->insert(std::make_pair(r->name(), r));
     r->table()->replicas()->insert(std::make_pair(r->name(), r));
     replicas_.insert(std::make_pair(r->name(), r));
-
-    // create store engine
-    std::string path;
-    //path = 
-    //StoreEngine *s = new StoreEngine();
-
     return r;
 }
 
@@ -101,7 +111,23 @@ Replica* MetaManager::GetReplica(std::string name)
 Replica* MetaManager::GetPrimaryReplica(
     std::string table_name, int32_t replica_id)
 {
+    // ugly
+    std::map<std::string, Replica*> replicas_;
+    std::map<std::string, Node*> nodes_;
+    std::string replica_name;
 
+    std::map<std::string, Node*>::const_iterator nit;
+    std::map<std::string, Replica*>::const_iterator rit;
+    for (nit = nodes_.begin(); nit != nodes_.end(); nit++) {
+        std::string node_name = nit->second->name();
+        _ReplicaName(node_name, table_name, replica_id, replica_name);
+
+        rit = replicas_.find(replica_name);
+        if (rit != replicas_.end()) {
+            return rit->second;
+        }
+    }
+    return NULL;
 }
 
 void MetaManager::LogMeta()

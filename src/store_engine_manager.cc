@@ -33,20 +33,32 @@ int StoreEngineManager::Stop()
 }
 
 StoreEngine* StoreEngineManager::AddStoreEngine(
-    std::string partition_name,
+    std::string replica_name,
     StoreEngine* store_engine)
 {
-
+    std::map<std::string, StoreEngine*>::const_iterator it = store_engines_.find(replica_name);
+    if (it != store_engines_.end()) {
+        LOG_ERROR << "StoreEngine for " << replica_name << " already exist";
+        return NULL;
+    }
+    
+    store_engines_.insert(std::make_pair(replica_name, store_engine));
+    return store_engine;
 }
 
 StoreEngine* StoreEngineManager::GetStoreEngine(
-    std::string partition_name)
+    std::string replica_name)
 {
-
+    std::map<std::string, StoreEngine*>::const_iterator it = store_engines_.find(replica_name);
+    if (it != store_engines_.end()) {
+        return it->second;
+    } else {
+        return NULL;
+    }
 }
 
 StoreEngine* StoreEngineManager::DelStoreEngine(
-    std::string partition_name)
+    std::string replica_name)
 {
 
 }

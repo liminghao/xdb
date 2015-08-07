@@ -52,13 +52,15 @@ void XdbServer::Init()
     _EnsureDir();
 
     LOG_INFO << "MetaManager initialize ...";
-    meta_manager_ = new MetaManager();
+    meta_manager_ = new MetaManager(this);
     meta_manager_->Init();
     meta_manager_->LogMeta();
     
     LOG_INFO << "StoreEngineManager initialize ...";
     store_engine_manager_ = new StoreEngineManager();
     store_engine_manager_->Init();
+
+    meta_manager_->TestMeta();
 
     LOG_INFO << "AdminServer initialize ...";
     admin_server_ = new AdminServer(this, conf_->adminport());

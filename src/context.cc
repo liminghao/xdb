@@ -56,6 +56,7 @@ int Context::ExecuteCmd()
             ->GetPrimaryReplica(table_->name(), replica_id);
         if (r == NULL) {
             conn_->forceClose();
+            return -1;
         }
         store_engine_ = xdb_server_->store_engine_manager()
             ->GetStoreEngine(r->name());
@@ -66,6 +67,7 @@ int Context::ExecuteCmd()
             conn_->send("+OK\r\n", strlen("+OK\r\n"));
         } else {
             conn_->forceClose();
+            return -1;
         }
 
     } else if (strcmp(parsed_cmd->c_str(), "get") == 0) {
@@ -81,6 +83,7 @@ int Context::ExecuteCmd()
             conn_->send(resp, strlen(resp));
         } else {
             conn_->forceClose();
+            return -1;
         }
 
     } else if (strcmp(parsed_cmd->c_str(), "del") == 0) {
@@ -91,6 +94,7 @@ int Context::ExecuteCmd()
             conn_->send("+OK\r\n", strlen("+OK\r\n"));
         } else {
             conn_->forceClose();
+            return -1;
         }
     
     } else if (strcmp(parsed_cmd->c_str(), "quit") == 0) {

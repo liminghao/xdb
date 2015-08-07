@@ -16,9 +16,11 @@
 
 namespace xdb {
 
+class XdbServer;
+
 class MetaManager: boost::noncopyable {
 public:
-    MetaManager();
+    MetaManager(XdbServer *xdb_server);
     ~MetaManager();
 
     int Init();
@@ -35,6 +37,7 @@ public:
     void LogTable();
     void LogNode();
     void LogReplica();
+    void TestMeta();
 
     std::map<std::string, Node*> *nodes() { return &nodes_; }   
     std::map<std::string, Replica*> *replicas() { return &replicas_; }
@@ -47,6 +50,8 @@ private:
     std::map<std::string, Node*> nodes_;
     std::map<std::string, Replica*> replicas_;
     std::map<std::string, Table*> tables_;
+
+    XdbServer *xdb_server_;
 };
 
 } // namespace xdb
