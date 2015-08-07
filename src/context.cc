@@ -55,6 +55,8 @@ int Context::ExecuteCmd()
         Replica *r = xdb_server_->meta_manager()
             ->GetPrimaryReplica(table_->name(), replica_id);
         if (r == NULL) {
+            LOG_WARN << "No primary replica, replica_id:" << replica_id 
+                << "partition_num:" << table_->partition_num() << "table_name:" << table_->name();
             conn_->forceClose();
             return -1;
         }

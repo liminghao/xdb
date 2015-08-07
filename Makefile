@@ -3,3 +3,4 @@ all:
 
 clean:
 	rm -f xdb_server
+	rm -rf xdb_data

@@ -24,7 +24,9 @@ public:
         uint16_t port, std::string engine_type="leveldb")
         :name_(name), replicate_num_(replicate_num), port_(port),
         partition_num_(partition_num), engine_type_(engine_type)
-    {}
+    {
+        LOG_INFO << "======partition_num:" << partition_num;
+    }
 
     std::string name() { return name_; }
     int32_t replicate_num() { return replicate_num_; }

@@ -95,7 +95,11 @@ Replica* MetaManager::AddReplica(Replica *r)
 
 Table* MetaManager::GetTable(std::string name)
 {
-
+    std::map<std::string, Table*>::const_iterator it = tables_.find(name);
+    if (it == tables_.end()) {
+        return NULL;
+    }
+    return it->second;
 }
 
 Node* MetaManager::GetNode(std::string name)
@@ -112,8 +116,6 @@ Replica* MetaManager::GetPrimaryReplica(
     std::string table_name, int32_t replica_id)
 {
     // ugly
-    std::map<std::string, Replica*> replicas_;
-    std::map<std::string, Node*> nodes_;
     std::string replica_name;
 
     std::map<std::string, Node*>::const_iterator nit;
@@ -121,6 +123,8 @@ Replica* MetaManager::GetPrimaryReplica(
     for (nit = nodes_.begin(); nit != nodes_.end(); nit++) {
         std::string node_name = nit->second->name();
         _ReplicaName(node_name, table_name, replica_id, replica_name);
+
+LOG_INFO << "GetPrimaryReplica: " << replica_name;
 
         rit = replicas_.find(replica_name);
         if (rit != replicas_.end()) {
