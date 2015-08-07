@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include <assert.h>
 
 #include "data_server.h"
 #include "context.h"
@@ -79,7 +80,9 @@ void DataServer::_OnConnection(
         << conn->name();
 
     // set context
-    Context *c = new Context(conn.get(), xdb_server_);
+    Table *t = xdb_server_->meta_manager()->GetTable(tablename_);
+    assert(t != NULL);
+    Context *c = new Context(conn.get(), xdb_server_, t);
     conn->set_private_data(c);
     conn->set_private_data_destroy(delete_context);
 }

@@ -10,7 +10,8 @@
 
 namespace xdb {
 
-StoreEngine::StoreEngine()
+StoreEngine::StoreEngine(std::string path)
+    :path_(path)
 {
 
 }
@@ -24,7 +25,7 @@ void StoreEngine::Start()
 {
     leveldb::Options options;
     options.create_if_missing = true;
-    leveldb::Status status = leveldb::DB::Open(options, "/tmp/testdb", &db_);
+    leveldb::Status status = leveldb::DB::Open(options, path_.c_str(), &db_);
     assert(status.ok());
 }
 

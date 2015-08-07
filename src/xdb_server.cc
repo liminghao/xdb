@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "xdb_server.h"
 
 namespace xdb {
@@ -22,12 +24,33 @@ XdbServer::~XdbServer()
     }
 }
 
+int XdbServer::_EnsureDir()
+{
+    // data_dir
+    std::string s;
+    std::string data_dir = *(conf_->data_dir());
+    int ret = access(data_dir.c_str(), F_OK);
+    if (ret != 0) {
+        LOG_INFO << "DataDir:" << data_dir << " not exist, create it";
+        mkdir(data_dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        s = data_dir;
+        s.append("/store_engine");
+        mkdir(s.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        s = data_dir;
+        s.append("/binlog");
+        mkdir(s.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    } else {
+        LOG_INFO << "DataDir:" << data_dir << " exist";
+    }
+}
+
 void XdbServer::Init()
 {
     LOG_INFO << "Configure initialize ...";
     conf_ = new Configure();
     conf_->InitTest();
-    
+    _EnsureDir();
+
     LOG_INFO << "MetaManager initialize ...";
     meta_manager_ = new MetaManager();
     meta_manager_->Init();
@@ -80,7 +103,7 @@ int XdbServer::_StartDataServer()
     std::map<std::string, DataServer*>::const_iterator it;
     for (it = data_servers_.begin(); it != data_servers_.end(); ++it) {
         DataServer *d = it->second;
-        LOG_INFO << "DataServer for " << *(d->tablename()) << " start ...";
+        LOG_INFO << "DataServer for table:" << *(d->tablename()) << " start ...";
         d->Start();
     }
 }

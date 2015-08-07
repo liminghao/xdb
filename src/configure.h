@@ -31,6 +31,9 @@ public:
     uint32_t wait_second() { return wait_second_; }
     std::string filename() { return filename_; }
 
+    // new
+    std::string *data_dir() { return &data_dir_; }
+
 private:
     std::string filename_;      // config filename xml
     TiXmlDocument* document_;
@@ -39,6 +42,9 @@ private:
     uint32_t worker_threadnum_; // thread number in the admin thread pool
     uint32_t sleep_second_;
     uint32_t wait_second_;
+
+    // new
+    std::string data_dir_;
 };
 
 } // namespace xdb

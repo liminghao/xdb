@@ -2,15 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
-#include "context.h"
 #include <string.h>
+
+#include "util.h"
+#include "context.h"
+#include "metadata.h"
+#include "xdb_server.h"
 
 namespace xdb {
 
-class XdbServer;
-
-Context::Context(muduo::net::TcpConnection *conn, XdbServer *xdb_server)
-    :xdb_server_(xdb_server)
+Context::Context(muduo::net::TcpConnection *conn, 
+    XdbServer *xdb_server, Table *table)
+    :xdb_server_(xdb_server), table_(table)
 {
     conn_ = conn;
 }
@@ -29,9 +32,6 @@ Context::~Context()
 int Context::Parse(muduo::net::Buffer* buf)
 {
     int ret = redis_protocol_analyzer_.Parse(buf);
-    
-    // get engine by key
-    store_engine_ = new StoreEngine();
     return ret;
 }
 
@@ -49,8 +49,19 @@ int Context::ExecuteCmd()
     if (strcmp(parsed_cmd->c_str(), "set") == 0) {
         std::string key((*parsed_bytes)[1].data(), (*parsed_bytes)[1].size());
         std::string value((*parsed_bytes)[2].data(), (*parsed_bytes)[2].size());
-        ret = store_engine_->Set(key, value);
+        
+        // get engine by key
+        int replica_id = simple_hash(key.c_str(), table_->partition_num());
+        Replica *r = xdb_server_->meta_manager()
+            ->GetPrimaryReplica(table_->name(), replica_id);
+        if (r == NULL) {
+            conn_->forceClose();
+        }
+        store_engine_ = xdb_server_->store_engine_manager()
+            ->GetStoreEngine(r->name());
+        assert(store_engine_ != NULL);
 
+        ret = store_engine_->Set(key, value);
         if (ret == 0) {
             conn_->send("+OK\r\n", strlen("+OK\r\n"));
         } else {

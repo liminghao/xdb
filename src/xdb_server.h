@@ -6,6 +6,7 @@
 #define XDB_SERVER_H_
 
 #include <boost/noncopyable.hpp>
+#include <unistd.h>
 #include <string>
 #include <map>
 
@@ -37,6 +38,7 @@ public:
 
 private:
 
+    int _EnsureDir();
     int _InitDataServer();
     int _StartDataServer();
     DataServer *_AddDataServer(std::string tablename, DataServer* d);

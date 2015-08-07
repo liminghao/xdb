@@ -8,7 +8,7 @@ namespace xdb {
 
 void Configure::InitTest()
 {
-
+    data_dir_ = "./xdb_data";
 }
 
 // read configure file(xml), get the parameter

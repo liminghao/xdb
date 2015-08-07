@@ -16,7 +16,7 @@ namespace xdb {
 
 class StoreEngine: boost::noncopyable {
 public:
-    StoreEngine();
+    StoreEngine(std::string path);
     ~StoreEngine();
 
     void Start();
@@ -27,6 +27,7 @@ public:
 
 private:
     leveldb::DB* db_;
+    std::string path_;
 };
 
 } // namespace xdb

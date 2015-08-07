@@ -3,6 +3,7 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 #include "meta_manager.h"
+#include "store_engine.h"
 
 namespace xdb {
 
@@ -72,8 +73,13 @@ Replica* MetaManager::AddReplica(Replica *r)
     // since the partition belongs to one node, one table
     r->node()->replicas()->insert(std::make_pair(r->name(), r));
     r->table()->replicas()->insert(std::make_pair(r->name(), r));
-    
     replicas_.insert(std::make_pair(r->name(), r));
+
+    // create store engine
+    std::string path;
+    //path = 
+    //StoreEngine *s = new StoreEngine();
+
     return r;
 }
 
