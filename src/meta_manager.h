@@ -32,6 +32,7 @@ public:
     Replica* GetReplica(std::string name);
     Replica* GetPrimaryReplica(
         std::string table_name, int32_t replica_id);
+    Replica* AddPrimaryReplica(Replica *r);
 
     void LogMeta();
     void LogTable();
@@ -46,11 +47,13 @@ public:
 private:
     void _ReplicaName(std::string node_name, std::string table_name, 
         int32_t replica_id, std::string &replica_name);
-
+    
     std::map<std::string, Node*> nodes_;
     std::map<std::string, Replica*> replicas_;
     std::map<std::string, Table*> tables_;
-
+    
+    // table -> primary replicas
+    std::map<std::string, std::map<int32_t, Replica*> > primary_replicas_;
     XdbServer *xdb_server_;
 };
 

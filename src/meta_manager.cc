@@ -41,6 +41,7 @@ void MetaManager::TestMeta()
         r->set_table(t);
         r->set_status(kPrimary);
         AddReplica(r);
+        AddPrimaryReplica(r);
 
         // create store engine
         char path[256];
@@ -112,26 +113,39 @@ Replica* MetaManager::GetReplica(std::string name)
 
 }
 
+Replica* MetaManager::AddPrimaryReplica(Replica *r)
+{
+    std::map<int32_t, Replica*> id2replica;
+    std::map<int32_t, Replica*> *id2replicap;
+    std::map<std::string, std::map<int32_t, Replica*> >::iterator it = 
+        primary_replicas_.find(r->name());
+    if (it == primary_replicas_.end()) {
+        primary_replicas_.insert(std::make_pair(r->name(), id2replica));
+        id2replicap = &id2replica;
+    } else {
+        id2replicap = &(it->second);
+    }
+
+    id2replicap->erase(r->id());
+    id2replicap->insert(std::make_pair(r->id(), r));
+    return r;
+}
+
 Replica* MetaManager::GetPrimaryReplica(
     std::string table_name, int32_t replica_id)
 {
-    // ugly
-    std::string replica_name;
-
-    std::map<std::string, Node*>::const_iterator nit;
-    std::map<std::string, Replica*>::const_iterator rit;
-    for (nit = nodes_.begin(); nit != nodes_.end(); nit++) {
-        std::string node_name = nit->second->name();
-        _ReplicaName(node_name, table_name, replica_id, replica_name);
-
-LOG_INFO << "GetPrimaryReplica: " << replica_name;
-
-        rit = replicas_.find(replica_name);
-        if (rit != replicas_.end()) {
-            return rit->second;
-        }
+    std::map<std::string, std::map<int32_t, Replica*> >::iterator it = 
+        primary_replicas_.find(table_name);
+    if (it == primary_replicas_.end()) {
+        return NULL;
     }
-    return NULL;
+    
+    std::map<int32_t, Replica*> *id2replica = &(it->second);
+    std::map<int32_t, Replica*>::iterator rit = id2replica->find(replica_id);
+    if (rit == id2replica->end()) {
+        return NULL;
+    }
+    return rit->second;
 }
 
 void MetaManager::LogMeta()

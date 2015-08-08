@@ -46,24 +46,28 @@ int XdbServer::_EnsureDir()
 
 void XdbServer::Init()
 {
-    LOG_INFO << "Configure initialize ...";
     conf_ = new Configure();
+    meta_manager_ = new MetaManager(this);
+    store_engine_manager_ = new StoreEngineManager();
+    admin_server_ = new AdminServer(this, conf_->adminport());
+
+    LOG_INFO << "Configure initialize ...";
     conf_->InitTest();
+
+    LOG_INFO << "Ensure dir ...";
     _EnsureDir();
 
     LOG_INFO << "MetaManager initialize ...";
-    meta_manager_ = new MetaManager(this);
     meta_manager_->Init();
+    meta_manager_->TestMeta();
     meta_manager_->LogMeta();
     
     LOG_INFO << "StoreEngineManager initialize ...";
-    store_engine_manager_ = new StoreEngineManager();
     store_engine_manager_->Init();
 
-    meta_manager_->TestMeta();
+    // add engine, load engine
 
     LOG_INFO << "AdminServer initialize ...";
-    admin_server_ = new AdminServer(this, conf_->adminport());
     admin_server_->Init();
     
     LOG_INFO << "DataServer initialize ...";
