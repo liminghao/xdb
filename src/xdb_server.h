@@ -27,6 +27,7 @@ public:
     XdbServer();
     ~XdbServer();
 
+    void TestInit();
     void Init();
     void Start();
     void Stop();
@@ -35,13 +36,13 @@ public:
     MetaManager *meta_manager() { return meta_manager_; }
     StoreEngineManager *store_engine_manager()
     { return store_engine_manager_; }
+    DataServer *AddDataServer(std::string tablename, DataServer* d);
 
 private:
 
     int _EnsureDir();
     int _InitDataServer();
     int _StartDataServer();
-    DataServer *_AddDataServer(std::string tablename, DataServer* d);
 
     AdminServer *admin_server_;
 

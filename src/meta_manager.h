@@ -18,6 +18,11 @@ namespace xdb {
 
 class XdbServer;
 
+Table* AddTable(std::string name, int32_t replicate_num, int32_t partition_num,
+        uint16_t port, std::string engine_type);
+Node* AddNode(std::string ip, uint16_t port);
+Replica* AddReplica(std::string table_name, std::string node_name, int32_t replica_id);
+
 class MetaManager: boost::noncopyable {
 public:
     MetaManager(XdbServer *xdb_server);
@@ -53,7 +58,7 @@ private:
     std::map<std::string, Table*> tables_;
     
     // table -> primary replicas
-    std::map<std::string, std::map<int32_t, Replica*> > primary_replicas_;
+    std::map<std::string, std::map<int32_t, Replica*>* > primary_replicas_;
     XdbServer *xdb_server_;
 };
 

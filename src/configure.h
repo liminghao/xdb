@@ -23,7 +23,7 @@ public:
         :document_(NULL)
     {}
 
-    void InitTest();
+    void Init();
     void Init(std::string filename);
     uint16_t adminport() { return adminport_; }
     uint32_t worker_threadnum() { return worker_threadnum_; }

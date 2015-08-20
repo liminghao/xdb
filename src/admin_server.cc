@@ -14,7 +14,7 @@ AdminServer::AdminServer(XdbServer *xdb_server, uint16_t port)
     main_thread_(boost::bind(
         &AdminServer::_ThreadStartFunc, this), "AdminServerMainThread")
 {
-    
+    LOG_DEBUG << "AdminServer port:" << port_;
 }
 
 AdminServer::~AdminServer()

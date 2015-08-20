@@ -6,9 +6,10 @@
 
 namespace xdb {
 
-void Configure::InitTest()
+void Configure::Init()
 {
     data_dir_ = "./xdb_data";
+    adminport_ = 39000;
 }
 
 // read configure file(xml), get the parameter
