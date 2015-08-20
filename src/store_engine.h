@@ -21,9 +21,9 @@ public:
 
     void Start();
     void Stop();
-    int Set(std::string key, std::string value);
-    int Get(std::string key, std::string &value);
-    int Del(std::string key);
+    leveldb::Status Set(std::string key, std::string value);
+    leveldb::Status Get(std::string key, std::string &value);
+    leveldb::Status Del(std::string key);
 
 private:
     leveldb::DB* db_;

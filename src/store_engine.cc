@@ -34,44 +34,44 @@ void StoreEngine::Stop()
     delete db_;
 }
 
-int StoreEngine::Set(std::string key, std::string value)
+leveldb::Status StoreEngine::Set(std::string key, std::string value)
 {
     leveldb::Status s;
     s = db_->Put(leveldb::WriteOptions(), key, value);
     if (!s.ok()) {
         LOG_WARN << "set failed " << key << " " << value;
-        return -1;
+        return s;
     }
 
     LOG_INFO << "set success " << key << " " << value;
-    return 0;
+    return s;
 }
 
-int StoreEngine::Get(std::string key, std::string &value)
+leveldb::Status StoreEngine::Get(std::string key, std::string &value)
 {
     leveldb::Status s;
     s = db_->Get(leveldb::ReadOptions(), key, &value);
     if (!s.ok()) {
-        LOG_WARN << "get failed " << key << " " << value;
-        return -1;
+        LOG_WARN << "get failed " << key;
+        return s;
     }
 
     LOG_INFO << "get success " << key << " " << value;
-    return 0;
+    return s;
     
 }
 
-int StoreEngine::Del(std::string key)
+leveldb::Status StoreEngine::Del(std::string key)
 {
     leveldb::Status s;
     s = db_->Delete(leveldb::WriteOptions(), key);
     if (!s.ok()) {
         LOG_WARN << "del failed " << key;
-        return -1;
+        return s;
     }
 
     LOG_INFO << "del success " << key;
-    return 0;
+    return s;
 }
 
 

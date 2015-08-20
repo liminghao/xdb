@@ -199,10 +199,10 @@ Replica* MetaManager::AddPrimaryReplica(Replica *r)
 {
     std::map<int32_t, Replica*> *id2replicap;
     std::map<std::string, std::map<int32_t, Replica*>* >::iterator it = 
-        primary_replicas_->find(r->table()->name());
-    if (it == primary_replicas_->end()) {
+        primary_replicas_.find(r->table()->name());
+    if (it == primary_replicas_.end()) {
         id2replicap = new std::map<int32_t, Replica*>();
-        primary_replicas_->insert(std::make_pair(r->name(), id2replicap));
+        primary_replicas_.insert(std::make_pair(r->table()->name(), id2replicap));
     } else {
         id2replicap = it->second;
     }
@@ -215,15 +215,17 @@ Replica* MetaManager::AddPrimaryReplica(Replica *r)
 Replica* MetaManager::GetPrimaryReplica(
     std::string table_name, int32_t replica_id)
 {
-    std::map<std::string, std::map<int32_t, Replica*> >::iterator it = 
-        primary_replicas_->find(table_name);
-    if (it == primary_replicas_->end()) {
+    std::map<std::string, std::map<int32_t, Replica*>* >::iterator it = 
+        primary_replicas_.find(table_name);
+    if (it == primary_replicas_.end()) {
+        LOG_DEBUG << "GetPrimaryReplica it == primary_replicas_.end()";
         return NULL;
     }
     
-    std::map<int32_t, Replica*> *id2replica = &(it->second);
+    std::map<int32_t, Replica*> *id2replica = it->second;
     std::map<int32_t, Replica*>::iterator rit = id2replica->find(replica_id);
     if (rit == id2replica->end()) {
+        LOG_DEBUG << "GetPrimaryReplica rit == id2replica->end()";
         return NULL;
     }
     return rit->second;
