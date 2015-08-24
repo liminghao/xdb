@@ -98,7 +98,7 @@ int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
 {
     int r, type_int, size_int;
     switch (type) {
-        kBinLogTypeKV:
+        case kBinLogTypeKV:
             size_int = 100;
             r = write(write_fd_, &size_int, sizeof(int));       
             LOG_DEBUG << "Write size_int return " << r;
