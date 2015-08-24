@@ -5,6 +5,10 @@
 #include <muduo/base/Logging.h>
 #include "xdb_server.h"
 #include "global.h"
+#include "binlog.h"
+
+//#define MAIN_SERVER_
+#define BINLOG_TEST_
 
 extern xdb::XdbServer *gXdbServer;
 
@@ -15,10 +19,19 @@ void TestMeta();
 int main(int argc, char** argv)
 {
     muduo::Logger::setLogLevel(muduo::Logger::DEBUG);
+    int ret;
 
+#ifdef MAIN_SERVER_
     Init();
     Start();
     TestMeta();
+#endif
+
+#ifdef BINLOG_TEST_
+    xdb::BinLog *binlog_handler = new xdb::BinLog("./testbinlog");
+    ret = binlog_handler->Start();
+    LOG_DEBUG << "binlog_handler.Start ret:" << ret;
+#endif
 
     sleep(1000000);
     exit(0);

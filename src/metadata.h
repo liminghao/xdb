@@ -6,10 +6,12 @@
 #define XDB_METADATA_H_
 
 #include <boost/noncopyable.hpp>
+#include <map>
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <muduo/base/Logging.h>
 #include "store_engine.h"
 
 namespace xdb {
