@@ -70,6 +70,13 @@ int BinLog::Start()
     } else if (ret == 0) {
         // end of file
         read_pos_ = 0;
+        int r = write(read_pos_fd_, "0", strlen("0"));
+        LOG_DEBUG << "Write return " << r;
+        if (r <= 0) {
+            LOG_ERROR << "Write error";
+            return kBinLogRetFailed;
+        }
+
     } else {
         sscanf(buf, "%d", &read_pos_);
     }
@@ -87,9 +94,48 @@ int BinLog::Start()
 }
 
 // if not kv type, encode name and key to "key"
-int BinLog::AppendRecord(int type, std::string &key, std::string &value)
+int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
 {
+    int r, type_int, size_int;
+    switch (type) {
+        kBinLogTypeKV:
+            size_int = 100;
+            r = write(write_fd_, &size_int, sizeof(int));       
+            LOG_DEBUG << "Write size_int return " << r;
+            if (r <= 0) {
+                LOG_ERROR << "Write size_int error";
+                return kBinLogRetFailed;
+            }
 
+            type_int = static_cast<int> (type);
+            r = write(write_fd_, &type_int, sizeof(int));       
+            LOG_DEBUG << "Write type_int return " << r;
+            if (r <= 0) {
+                LOG_ERROR << "Write type_int error";
+                return kBinLogRetFailed;
+            }
+
+            r = write(write_fd_, key.c_str(), key.size());       
+            LOG_DEBUG << "Write key return " << r;
+            if (r <= 0) {
+                LOG_ERROR << "Write key error";
+                return kBinLogRetFailed;
+            }
+
+            r = write(write_fd_, value.c_str(), value.size());       
+            LOG_DEBUG << "Write value return " << r;
+            if (r <= 0) {
+                LOG_ERROR << "Write value error";
+                return kBinLogRetFailed;
+            }
+    
+            break;
+        default:
+            LOG_ERROR << "Error BinLogType:" << type;
+            break;
+    }
+
+    return kBinLogRetSuccess;
 }
 
 // get one record from read pos

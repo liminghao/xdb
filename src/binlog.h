@@ -31,6 +31,11 @@ enum BinLogRet {
     kBinLogRetFailed,
 };
 
+enum BinLogType {
+    kBinLogTypeKV = 0,
+    kBinLogTypeHash,
+};
+
 class BinLog: boost::noncopyable {
 public:
     BinLog(std::string path);
@@ -39,7 +44,7 @@ public:
     int Start();
 
     // if not kv type, encode name and key to "key"
-    int AppendRecord(int type, std::string &key, std::string &value);
+    int AppendRecord(BinLogType type, std::string &key, std::string &value);
 
     // get one record from read pos
     int KVGetRecord(std::string &key, std::string &value);

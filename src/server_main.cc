@@ -30,7 +30,13 @@ int main(int argc, char** argv)
 #ifdef BINLOG_TEST_
     xdb::BinLog *binlog_handler = new xdb::BinLog("./testbinlog");
     ret = binlog_handler->Start();
-    LOG_DEBUG << "binlog_handler.Start ret:" << ret;
+    LOG_DEBUG << "binlog_handler->Start ret:" << ret;
+
+    std::string key("testkey");
+    std::string value("testvalue");
+    ret = binlog_handler->AppendRecord(xdb::kBinLogTypeKV, key, value);
+    LOG_DEBUG << "binlog_handler->AppendRecord ret:" << ret;
+
 #endif
 
     sleep(1000000);
