@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
+#include <errno.h>
 #include <sys/stat.h>
 #include "binlog.h"
 
@@ -15,6 +16,7 @@ BinLog::BinLog(std::string path)
 
 BinLog::~BinLog()
 {
+    LOG_DEBUG << "BinLog::~BinLog()";
     close(write_fd_);
     close(read_fd_);
 }
@@ -45,17 +47,20 @@ int BinLog::Start()
     }
 
     read_fd_ = open(current_file.c_str(), O_RDONLY|O_CREAT, 0644);
+    LOG_DEBUG << "Open read_fd_:" << read_fd_;
     if (read_fd_ == -1) {
         LOG_ERROR << "Open file " << current_file << " for read failed";
         return kBinLogRetFailed;
     }
-    write_fd_ = open(current_file.c_str(), O_APPEND|O_CREAT, 0644);
+    write_fd_ = open(current_file.c_str(), O_WRONLY|O_APPEND|O_CREAT, 0644);
+    LOG_DEBUG << "Open write_fd_:" << write_fd_; 
     if (write_fd_ == -1) {
         LOG_ERROR << "Open file " << current_file << " for write failed";
         return kBinLogRetFailed;
     }
 
     read_pos_fd_ = open(read_pos_file.c_str(), O_RDWR|O_CREAT, 0644);
+    LOG_DEBUG << "Open read_pos_fd_:" << read_pos_fd_; 
     if (read_pos_fd_ == -1) {
         LOG_ERROR << "Open file " << read_pos_file << " for read failed";
         return kBinLogRetFailed;
@@ -73,7 +78,9 @@ int BinLog::Start()
         int r = write(read_pos_fd_, "0", strlen("0"));
         LOG_DEBUG << "Write return " << r;
         if (r <= 0) {
-            LOG_ERROR << "Write error";
+            char tmpbuf[128];
+            strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+            LOG_ERROR << "Write error, reason:" << tmpbuf << "errno:" << errno;
             return kBinLogRetFailed;
         }
 
@@ -99,11 +106,16 @@ int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
     int r, type_int, size_int;
     switch (type) {
         case kBinLogTypeKV:
+
+            // maybe need endian change
             size_int = 100;
-            r = write(write_fd_, &size_int, sizeof(int));       
+            r = write(write_fd_, (char*)&size_int, sizeof(int));       
             LOG_DEBUG << "Write size_int return " << r;
             if (r <= 0) {
-                LOG_ERROR << "Write size_int error";
+                char tmpbuf[128];
+                memset(tmpbuf, 0, sizeof(tmpbuf));
+                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+                LOG_ERROR << "Write size_int error, reason:" << tmpbuf << "errno:" << errno;
                 return kBinLogRetFailed;
             }
 
@@ -111,21 +123,27 @@ int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
             r = write(write_fd_, &type_int, sizeof(int));       
             LOG_DEBUG << "Write type_int return " << r;
             if (r <= 0) {
-                LOG_ERROR << "Write type_int error";
+                char tmpbuf[128];
+                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+                LOG_ERROR << "Write type_int error, reason:" << tmpbuf << "errno:" << errno;
                 return kBinLogRetFailed;
             }
 
             r = write(write_fd_, key.c_str(), key.size());       
             LOG_DEBUG << "Write key return " << r;
             if (r <= 0) {
-                LOG_ERROR << "Write key error";
+                char tmpbuf[128];
+                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+                LOG_ERROR << "Write key error, reason:" << tmpbuf << "errno:" << errno;
                 return kBinLogRetFailed;
             }
 
             r = write(write_fd_, value.c_str(), value.size());       
             LOG_DEBUG << "Write value return " << r;
             if (r <= 0) {
-                LOG_ERROR << "Write value error";
+                char tmpbuf[128];
+                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+                LOG_ERROR << "Write value error, reason:" << tmpbuf << "errno:" << errno;
                 return kBinLogRetFailed;
             }
     
