@@ -1,0 +1,11 @@
+
+package binlog_proto;
+
+message GetMetadata2 {
+    required int32 cmd = 1;
+}
+
+message AAB {
+    required string key = 1;
+    required string value = 1;
+}
