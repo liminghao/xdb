@@ -19,12 +19,14 @@ namespace xdb {
 ////////////////////////////////////////////////
 //
 //  record format:
-//  | size   | type   | data            |
+//  | type   | size   | data            |
 //  | 4bytes | 4bytes | variable length |
 //
-//  size means "type" length + "data" length
+//  size means "data" length
 //
 ////////////////////////////////////////////////
+
+const int kblock_len = sizeof(int);
 
 enum BinLogRet {
     kBinLogRetSuccess = 0,
@@ -47,10 +49,17 @@ public:
     int AppendRecord(BinLogType type, std::string &key, std::string &value);
 
     // get one record from read pos
-    int KVGetRecord(std::string &key, std::string &value);
-    int HashGetRecord(std::string &name, std::string &key, std::string &value);
+    int GetRecord(std::string &key, std::string &value);
+    int GetRecordKV(std::string &input_key, std::string &input_value,
+        std::string &output_key, std::string &output_value);
+    int GetRecordHash(std::string &input_key, std::string &input_value,
+        std::string &output_name, std::string &output_key, std::string &output_value);
 
 private:
+    int _PrepareRecordKV(std::string &key, std::string &value, std::string &s);
+    int _DoAppendRecord(std::string &record);
+    int _IncrReadPos(int i);
+
     std::string path_;   
     std::string current_file_;  // simple, always one file
     std::string read_pos_file_;

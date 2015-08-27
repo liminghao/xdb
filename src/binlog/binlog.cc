@@ -4,6 +4,8 @@
 
 #include <errno.h>
 #include <sys/stat.h>
+
+#include "binlog/pb_binlog.pb.h"
 #include "binlog.h"
 
 namespace xdb {
@@ -100,69 +102,97 @@ int BinLog::Start()
     return kBinLogRetSuccess;
 }
 
+int BinLog::_PrepareRecordKV(std::string &key, std::string &value, std::string &s)
+{
+    binlog_proto::BinLogItemKV binlog_item_kv;
+    std::string s_body;
+    int size_int, type_int;
+    s.clear();
+
+    binlog_item_kv.set_key(key);
+    binlog_item_kv.set_value(value);
+    type_int = static_cast<int> (kBinLogTypeKV);
+    size_int = binlog_item_kv.ByteSize();
+    s.append(std::string((char*)&type_int, kblock_len));
+    s.append(std::string((char*)&size_int, kblock_len));
+    binlog_item_kv.SerializeToString(&s_body);
+    s.append(s_body);
+    
+    return kBinLogRetSuccess;
+}
+
+int BinLog::_DoAppendRecord(std::string &record)
+{
+    int r;
+    r = write(write_fd_, record.c_str(), record.size());
+    LOG_DEBUG << "Write binlog_item_kv_str return " << r;
+    if (r <= 0) {
+        char tmpbuf[128];
+        memset(tmpbuf, 0, sizeof(tmpbuf));
+        strerror_r(errno, tmpbuf, sizeof(tmpbuf));
+        LOG_ERROR << "Write binlog_item_kv_str error, reason:" << tmpbuf << "errno:" << errno;
+        return -1;
+    }
+    return r;
+}
+
 // if not kv type, encode name and key to "key"
 int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
 {
     int r, type_int, size_int;
+    std::string binlog_item_kv_str;
+
     switch (type) {
         case kBinLogTypeKV:
-
+        {
             // maybe need endian change
-            size_int = 100;
-            r = write(write_fd_, (char*)&size_int, sizeof(int));       
-            LOG_DEBUG << "Write size_int return " << r;
-            if (r <= 0) {
-                char tmpbuf[128];
-                memset(tmpbuf, 0, sizeof(tmpbuf));
-                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
-                LOG_ERROR << "Write size_int error, reason:" << tmpbuf << "errno:" << errno;
+            _PrepareRecordKV(key, value, binlog_item_kv_str);
+            r = _DoAppendRecord(binlog_item_kv_str);
+            if (r == -1) {
+                LOG_ERROR << "_DoAppendRecord" << "failed";
                 return kBinLogRetFailed;
             }
-
-            type_int = static_cast<int> (type);
-            r = write(write_fd_, &type_int, sizeof(int));       
-            LOG_DEBUG << "Write type_int return " << r;
-            if (r <= 0) {
-                char tmpbuf[128];
-                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
-                LOG_ERROR << "Write type_int error, reason:" << tmpbuf << "errno:" << errno;
-                return kBinLogRetFailed;
-            }
-
-            r = write(write_fd_, key.c_str(), key.size());       
-            LOG_DEBUG << "Write key return " << r;
-            if (r <= 0) {
-                char tmpbuf[128];
-                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
-                LOG_ERROR << "Write key error, reason:" << tmpbuf << "errno:" << errno;
-                return kBinLogRetFailed;
-            }
-
-            r = write(write_fd_, value.c_str(), value.size());       
-            LOG_DEBUG << "Write value return " << r;
-            if (r <= 0) {
-                char tmpbuf[128];
-                strerror_r(errno, tmpbuf, sizeof(tmpbuf));
-                LOG_ERROR << "Write value error, reason:" << tmpbuf << "errno:" << errno;
-                return kBinLogRetFailed;
-            }
-    
+            _IncrReadPos(r);
             break;
+        }
         default:
+        {
             LOG_ERROR << "Error BinLogType:" << type;
             break;
+        }
     }
 
     return kBinLogRetSuccess;
 }
 
+int BinLog::_IncrReadPos(int i)
+{
+    char tmpbuf[16];
+    int r;
+
+    assert(i >= 0);
+    read_pos_ += i;
+    memset(tmpbuf, 0, sizeof(tmpbuf));
+    snprintf(tmpbuf, sizeof(tmpbuf)-1, "%d", read_pos_);
+    lseek(read_pos_fd_, 0, SEEK_SET);
+    r = write(read_pos_fd_, tmpbuf, strlen(tmpbuf));
+    assert(r >= 0);
+}
+
 // get one record from read pos
-int BinLog::KVGetRecord(std::string &key, std::string &value)
+int BinLog::GetRecord(std::string &key, std::string &value)
 {
 
 }
 
-int BinLog::HashGetRecord(std::string &name, std::string &key, std::string &value)
+int BinLog::GetRecordKV(std::string &input_key, std::string &input_value,
+    std::string &output_key, std::string &output_value)
+{
+
+}
+
+int BinLog::GetRecordHash(std::string &input_key, std::string &input_value,
+    std::string &output_name, std::string &output_key, std::string &output_value)
 {
 
 }
