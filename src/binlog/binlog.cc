@@ -152,7 +152,6 @@ int BinLog::AppendRecord(BinLogType type, std::string &key, std::string &value)
                 LOG_ERROR << "_DoAppendRecord" << "failed";
                 return kBinLogRetFailed;
             }
-            _IncrReadPos(r);
             break;
         }
         default:
@@ -169,7 +168,6 @@ int BinLog::_IncrReadPos(int i)
 {
     char tmpbuf[16];
     int r;
-
     assert(i >= 0);
     read_pos_ += i;
     memset(tmpbuf, 0, sizeof(tmpbuf));
@@ -179,16 +177,70 @@ int BinLog::_IncrReadPos(int i)
     assert(r >= 0);
 }
 
+int BinLog::_ReadNBytesFromBinlog(char *buf, int n)
+{
+    assert(n > 0);    
+    int ret;
+    ret = read(read_fd_, buf, n);
+    if (ret != n) {
+        LOG_ERROR << "Read " << n << " bytes not enough, actually " << ret;
+    }
+    return ret;
+}
+
 // get one record from read pos
 int BinLog::GetRecord(std::string &key, std::string &value)
 {
+    int size_int, type_int, ret;
 
+    ret = _ReadNBytesFromBinlog((char*)&type_int, kblock_len);
+    if (ret != kblock_len) {
+        LOG_ERROR << "Read type_int error, ret:" << ret;
+        return kBinLogRetFailed;
+    }
+
+    ret = _ReadNBytesFromBinlog((char*)&size_int, kblock_len);
+    if (ret != kblock_len) {
+        LOG_ERROR << "Read size_int error, ret:" << ret;
+        return kBinLogRetFailed;
+    }
+
+    LOG_DEBUG << "Item type:" << type_int << ", Item size:" << size_int;
+    char *tmpbuf = (char *)malloc(size_int);
+    assert(tmpbuf != NULL);
+    switch (type_int) {
+        case kBinLogTypeKV:
+        {
+            ret = _ReadNBytesFromBinlog(tmpbuf, size_int);
+            if (ret != size_int) {
+                free(tmpbuf);
+                LOG_ERROR << "Read size_int error, ret:" << ret;
+                return kBinLogRetFailed;
+            }
+            binlog_proto::BinLogItemKV binlog_item_kv;
+            binlog_item_kv.ParseFromString(std::string(tmpbuf));
+            key = binlog_item_kv.key();
+            value = binlog_item_kv.value();
+            LOG_DEBUG << "key:" << key << " value:" << value;
+
+            _IncrReadPos(kblock_len*2 + size_int);
+            break;
+        }
+        default:
+        {
+            free(tmpbuf);
+            LOG_ERROR << "Unknown binlog type";
+            return kBinLogRetFailed;
+        }
+    }
+
+    free(tmpbuf);
+    return kBinLogRetSuccess;
 }
 
 int BinLog::GetRecordKV(std::string &input_key, std::string &input_value,
     std::string &output_key, std::string &output_value)
 {
-
 }
 
 int BinLog::GetRecordHash(std::string &input_key, std::string &input_value,

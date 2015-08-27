@@ -59,6 +59,7 @@ private:
     int _PrepareRecordKV(std::string &key, std::string &value, std::string &s);
     int _DoAppendRecord(std::string &record);
     int _IncrReadPos(int i);
+    int _ReadNBytesFromBinlog(char *buf, int n);
 
     std::string path_;   
     std::string current_file_;  // simple, always one file

@@ -34,8 +34,15 @@ int main(int argc, char** argv)
 
     std::string key("testkey");
     std::string value("testvalue");
+    std::string key1("testkey");
+    std::string value1("testvalue");
     ret = binlog_handler->AppendRecord(xdb::kBinLogTypeKV, key, value);
+    ret = binlog_handler->AppendRecord(xdb::kBinLogTypeKV, key1, value1);
     LOG_DEBUG << "binlog_handler->AppendRecord ret:" << ret;
+
+    std::string k, v;
+    ret = binlog_handler->GetRecord(k, v);
+    ret = binlog_handler->GetRecord(k, v);
 
 #endif
 
