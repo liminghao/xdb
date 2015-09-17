@@ -20,6 +20,8 @@
 
 #include "store_engine_manager.h"
 #include "store_engine.h"
+#include "binlog.h"
+#include "binlog_manager.h"
 #include "context.h"
 
 namespace xdb {
@@ -54,6 +56,7 @@ private:
     XdbServer *xdb_server_;
     std::map<std::string, Context*> contexts_;
     StoreEngineManager *store_engine_manager_;
+    BinlogManager *binlog_manager_;
 };
 
 } // namespace xdb

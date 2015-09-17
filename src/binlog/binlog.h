@@ -49,7 +49,7 @@ public:
     int AppendRecord(BinLogType type, std::string &key, std::string &value);
 
     // get one record from read pos
-    int GetRecord(std::string &key, std::string &value);
+    int GetRecord(BinLogType &type, std::string &key, std::string &value);
     int GetRecordKV(std::string &input_key, std::string &input_value,
         std::string &output_key, std::string &output_value);
     int GetRecordHash(std::string &input_key, std::string &input_value,

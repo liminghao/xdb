@@ -7,8 +7,8 @@
 #include "global.h"
 #include "binlog.h"
 
-//#define MAIN_SERVER_
-#define BINLOG_TEST_
+#define MAIN_SERVER_
+//#define BINLOG_TEST_
 
 extern xdb::XdbServer *gXdbServer;
 
@@ -40,9 +40,12 @@ int main(int argc, char** argv)
     ret = binlog_handler->AppendRecord(xdb::kBinLogTypeKV, key1, value1);
     LOG_DEBUG << "binlog_handler->AppendRecord ret:" << ret;
 
+    xdb::BinLogType type;
     std::string k, v;
-    ret = binlog_handler->GetRecord(k, v);
-    ret = binlog_handler->GetRecord(k, v);
+    ret = binlog_handler->GetRecord(type, k, v);
+    LOG_DEBUG << type;
+    ret = binlog_handler->GetRecord(type, k, v);
+    LOG_DEBUG << type;
 
 #endif
 

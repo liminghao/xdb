@@ -4,6 +4,7 @@
 
 #include "meta_manager.h"
 #include "store_engine.h"
+#include "binlog.h"
 #include "xdb_server.h"
 
 namespace xdb {
@@ -80,6 +81,13 @@ Replica* AddReplica(std::string table_name, std::string node_name, int32_t repli
     s->Start();
     gXdbServer->store_engine_manager()->AddStoreEngine(r->name(), s);
     
+    memset(path, 0, sizeof(path));
+    sprintf(path, "%s/binlog/%d",
+        gXdbServer->conf()->data_dir()->c_str(), r->id());
+    BinLog *b = new BinLog(path);
+    b->Start();
+
+    gXdbServer->store_engine_manager()->AddStoreEngine(r->name(), s);
     r->set_status(kPrimary);
     gXdbServer->meta_manager()->AddReplica(r);
     gXdbServer->meta_manager()->AddPrimaryReplica(r);

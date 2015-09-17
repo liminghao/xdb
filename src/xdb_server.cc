@@ -63,6 +63,9 @@ void XdbServer::Init()
     LOG_INFO << "StoreEngineManager initialize ...";
     store_engine_manager_->Init();
 
+    LOG_INFO << "BinlogManager initialize ...";
+    binlog_manager_->Init();
+
     // add engine, load engine
 
     LOG_INFO << "AdminServer initialize ...";

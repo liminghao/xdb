@@ -172,6 +172,7 @@ int BinLog::_IncrReadPos(int i)
     read_pos_ += i;
     memset(tmpbuf, 0, sizeof(tmpbuf));
     snprintf(tmpbuf, sizeof(tmpbuf)-1, "%d", read_pos_);
+    LOG_DEBUG << "write readpos:" << tmpbuf;
     lseek(read_pos_fd_, 0, SEEK_SET);
     r = write(read_pos_fd_, tmpbuf, strlen(tmpbuf));
     assert(r >= 0);
@@ -189,7 +190,7 @@ int BinLog::_ReadNBytesFromBinlog(char *buf, int n)
 }
 
 // get one record from read pos
-int BinLog::GetRecord(std::string &key, std::string &value)
+int BinLog::GetRecord(BinLogType &type, std::string &key, std::string &value)
 {
     int size_int, type_int, ret;
 
@@ -198,6 +199,7 @@ int BinLog::GetRecord(std::string &key, std::string &value)
         LOG_ERROR << "Read type_int error, ret:" << ret;
         return kBinLogRetFailed;
     }
+    type = static_cast<BinLogType> (type_int);
 
     ret = _ReadNBytesFromBinlog((char*)&size_int, kblock_len);
     if (ret != kblock_len) {
@@ -241,6 +243,8 @@ int BinLog::GetRecord(std::string &key, std::string &value)
 int BinLog::GetRecordKV(std::string &input_key, std::string &input_value,
     std::string &output_key, std::string &output_value)
 {
+    output_key = input_key;
+    output_value = input_value;
 }
 
 int BinLog::GetRecordHash(std::string &input_key, std::string &input_value,

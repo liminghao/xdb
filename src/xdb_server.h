@@ -16,6 +16,7 @@
 #include "configure.h"
 #include "meta_manager.h"
 #include "store_engine_manager.h"
+#include "binlog_manager.h"
 
 namespace xdb {
 
@@ -37,6 +38,8 @@ public:
     StoreEngineManager *store_engine_manager()
     { return store_engine_manager_; }
     DataServer *AddDataServer(std::string tablename, DataServer* d);
+    BinlogManager *binlog_manager()
+    { return binlog_manager_; }
 
 private:
 
@@ -52,6 +55,7 @@ private:
     Configure *conf_;
     MetaManager *meta_manager_;
     StoreEngineManager *store_engine_manager_;
+    BinlogManager *binlog_manager_;
 };
 
 } // namespace xdb

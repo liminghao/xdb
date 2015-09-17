@@ -63,6 +63,7 @@ void DataServer::Init()
 //    server_->setThreadNum(loop_thread_num_);
 
     store_engine_manager_ = xdb_server_->store_engine_manager();
+    binlog_manager_ = xdb_server_->binlog_manager();
 }
 
 void DataServer::Start()
